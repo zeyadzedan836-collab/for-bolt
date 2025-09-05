@@ -289,22 +289,10 @@
 
                 const text = passage.text || passage.content || '';
                 document.getElementById('preview-modal-title').textContent = passage.title || '';
- codex/sanitize-difficulty-badge-in-previewpassage
                 const validDiffs = ['easy','medium','hard'];
                 const diff = validDiffs.includes((passage.difficulty || '').toLowerCase()) ? passage.difficulty : 'Unknown';
                 document.getElementById('preview-modal-details').innerHTML = `
                     <span class="difficulty-badge ${diff.toLowerCase()}">${diff}</span>
-
- codex/update-passage-handling-in-subjects.html-y2qshh
-
-                const diff = passage.difficulty || 'Unknown';
-                document.getElementById('preview-modal-details').innerHTML = `
-                    <span class="difficulty-badge ${diff.toLowerCase()}">${diff}</span>
-
-                document.getElementById('preview-modal-details').innerHTML = `
-                    <span class="difficulty-badge ${passage.difficulty.toLowerCase()}">${passage.difficulty}</span>
- main
- main
                 `;
                 document.getElementById('preview-modal-text').textContent = text;
 
@@ -518,48 +506,5 @@
         }
     </style>
 
-    <script>
-        // Legacy function for backward compatibility
-        function loadSubjectStats() {
-            // This is now handled by the module script above
-        }
-
-        // Add hover animations to subject cards (legacy support)
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add hover animations to subject cards
-            document.querySelectorAll('.subject-card').forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-8px)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-        });
-    </script>
-</body>
-</html>
-
-                    }
-                }
-            });
-        }
-
-        // Add hover animations to subject cards
-        document.querySelectorAll('.subject-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-8px)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Load stats when page loads
-        document.addEventListener('DOMContentLoaded', loadSubjectStats);
-    </script>
-    <script src="assets/js/auth.js"></script>
 </body>
 </html>
