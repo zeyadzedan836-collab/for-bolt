@@ -1,0 +1,81 @@
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title">Choose Your Subject</h1>
+        <p class="page-subtitle">Select a subject to view available practice passages and quizzes</p>
+    </div>
+</section>
+
+<section class="subjects-section">
+    <div class="container">
+        <div class="subjects-grid" id="subjects-grid">
+            <!-- Loading skeletons -->
+            <div class="subject-card skeleton-card">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-description"></div>
+                <div class="skeleton-stats"></div>
+                <div class="skeleton-button"></div>
+            </div>
+            <div class="subject-card skeleton-card">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-description"></div>
+                <div class="skeleton-stats"></div>
+                <div class="skeleton-button"></div>
+            </div>
+            <div class="subject-card skeleton-card">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-description"></div>
+                <div class="skeleton-stats"></div>
+                <div class="skeleton-button"></div>
+            </div>
+            <div class="subject-card skeleton-card">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-description"></div>
+                <div class="skeleton-stats"></div>
+                <div class="skeleton-button"></div>
+            </div>
+            <div class="subject-card skeleton-card">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-description"></div>
+                <div class="skeleton-stats"></div>
+                <div class="skeleton-button"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Subject Passages Modal -->
+<div id="subject-modal" class="modal">
+    <div class="modal-content" style="max-width: 1000px;">
+        <div class="modal-header">
+            <h3 id="subject-modal-title">Biology Passages</h3>
+            <button class="modal-close" onclick="closeSubjectModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="subject-passages-container">
+                <div style="text-align: center; padding: 2rem;">
+                    Loading passages...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quiz Modal -->
+<div id="quiz-modal" class="modal">
+    <div class="modal-content" style="max-width: 1200px; max-height: 90vh;">
+        <div class="modal-header">
+            <h3 id="quiz-modal-title">Quiz</h3>
+            <button class="modal-close" onclick="closeQuizModal()">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+            <div id="quiz-container">
+                <!-- Quiz content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>

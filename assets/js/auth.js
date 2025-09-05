@@ -33,9 +33,9 @@ class AuthManager {
     this.currentUser = null;
     this.userRole = null;
     this.googleProvider = new GoogleAuthProvider();
-    this._ready = new Promise((resolve) => {
-      this._resolveReady = resolve;
-    });
+    this._ready = null;
+    this._resolveReady = null;
+    this._isReady = false;
     this.init();
   }
 
@@ -43,6 +43,16 @@ class AuthManager {
    * Promise that resolves when auth state and role are ready
    */
   ready() {
+    if (this._isReady) {
+      return Promise.resolve();
+    }
+    
+    if (!this._ready) {
+      this._ready = new Promise((resolve) => {
+        this._resolveReady = resolve;
+      });
+    }
+    
     return this._ready;
   }
 
@@ -50,6 +60,9 @@ class AuthManager {
    * Initialize auth state listener
    */
   init() {
+    // Show auth pending state
+    document.body.classList.add('auth-pending');
+    
     onAuthStateChanged(auth, async (user) => {
       this.currentUser = user;
       
@@ -57,15 +70,21 @@ class AuthManager {
         // User is signed in
         await this.loadUserRole();
         await this.updateLastLogin();
-        this.updateNavigation();
-        this.checkEmailVerification();
       } else {
         // User is signed out
         this.userRole = null;
-        this.updateNavigation();
+        // Clear cached role
+        this.clearRoleCache();
       }
       
-      this.checkAuthRequirement();
+      // Update navigation after role is determined
+      this.updateNavigation();
+      this.checkEmailVerification();
+      
+      // Mark as ready and remove pending state
+      this._isReady = true;
+      document.body.classList.remove('auth-pending');
+      
       if (this._resolveReady) {
         this._resolveReady();
         this._resolveReady = null;
@@ -80,46 +99,93 @@ class AuthManager {
     if (!this.currentUser) return;
 
     const cacheKey = `userRole:${this.currentUser.uid}`;
-    const cached = localStorage.getItem(cacheKey);
-    const now = Date.now();
+    const cached = this.getCachedRole(cacheKey);
+    
     if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (parsed.expires > now) {
-          this.userRole = parsed.role;
-          return;
-        }
-      } catch {}
+      this.userRole = cached;
+      return;
     }
 
+    // Try to get role from custom claims first (preferred)
     try {
       const token = await getIdTokenResult(this.currentUser);
       if (token.claims?.admin) {
         this.userRole = 'admin';
+        this.setCachedRole(cacheKey, 'admin');
+        return;
       }
-    } catch (e) {
-      console.error('Error checking custom claims:', e);
+    } catch (error) {
+      console.error('Error checking custom claims:', error);
     }
 
-    if (!this.userRole) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', this.currentUser.uid));
-        if (userDoc.exists()) {
-          this.userRole = userDoc.data().role || 'student';
-        } else {
-          await this.createUserDocument();
-          this.userRole = 'student';
-        }
-      } catch (error) {
-        console.error('Error loading user role:', error);
+    // Fallback to Firestore
+    try {
+      const userDoc = await getDoc(doc(db, 'users', this.currentUser.uid));
+      if (userDoc.exists()) {
+        this.userRole = userDoc.data().role || 'student';
+      } else {
+        await this.createUserDocument();
         this.userRole = 'student';
       }
+      
+      this.setCachedRole(cacheKey, this.userRole);
+    } catch (error) {
+      console.error('Error loading user role:', error);
+      this.userRole = 'student';
     }
+  }
 
-    localStorage.setItem(cacheKey, JSON.stringify({
-      role: this.userRole,
-      expires: now + 10 * 60 * 1000
-    }));
+  /**
+   * Get cached role if still valid
+   * @param {string} cacheKey - Cache key
+   * @returns {string|null} - Cached role or null
+   */
+  getCachedRole(cacheKey) {
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (!cached) return null;
+      
+      const parsed = JSON.parse(cached);
+      const now = Date.now();
+      
+      if (parsed.expires > now) {
+        return parsed.role;
+      }
+      
+      // Remove expired cache
+      localStorage.removeItem(cacheKey);
+      return null;
+    } catch (error) {
+      console.error('Error reading cached role:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Set cached role with 10 minute expiry
+   * @param {string} cacheKey - Cache key
+   * @param {string} role - User role
+   */
+  setCachedRole(cacheKey, role) {
+    try {
+      const cacheData = {
+        role: role,
+        expires: Date.now() + (10 * 60 * 1000) // 10 minutes
+      };
+      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    } catch (error) {
+      console.error('Error caching role:', error);
+    }
+  }
+
+  /**
+   * Clear cached role data
+   */
+  clearRoleCache() {
+    if (this.currentUser) {
+      const cacheKey = `userRole:${this.currentUser.uid}`;
+      localStorage.removeItem(cacheKey);
+    }
   }
 
   /**

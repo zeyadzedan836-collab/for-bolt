@@ -1883,10 +1883,33 @@ p {
 }
 
 /* Auth pending state */
-body.auth-pending .navbar {
-    visibility: hidden;
+body.auth-pending .nav-menu,
+body.auth-pending .auth-links,
+body.auth-pending .user-menu {
+    opacity: 0;
+    pointer-events: none;
 }
 
+/* Loading bar for auth and page transitions */
+.loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s linear infinite;
+    z-index: 2000;
+    width: 0%;
+    transition: width 0.3s ease, opacity 0.2s ease;
+}
+
+@keyframes loading-shimmer {
+    0% { background-position: 0 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Auth loading indicator */
 body.auth-pending::before {
     content: '';
     position: fixed;
@@ -1896,11 +1919,119 @@ body.auth-pending::before {
     height: 3px;
     background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
     background-size: 200% 100%;
-    animation: auth-loading 1.5s linear infinite;
+    animation: loading-shimmer 1.5s linear infinite;
     z-index: 2000;
 }
 
-@keyframes auth-loading {
-    0% { background-position: 0 0; }
-    100% { background-position: -200% 0; }
+/* Page loading state */
+body.page-loading {
+    cursor: wait;
+}
+
+/* Skeleton loading animations */
+.skeleton-card {
+    pointer-events: none;
+}
+
+.skeleton-card > * {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+.skeleton-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    margin-bottom: 0.5rem;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.skeleton-description {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.skeleton-description:last-of-type {
+    width: 60%;
+}
+
+.skeleton-stats {
+    height: 1.5rem;
+    margin-bottom: 1rem;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.skeleton-button {
+    height: 2.5rem;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.skeleton-meta {
+    height: 1rem;
+    margin-bottom: 1rem;
+    width: 80%;
+}
+
+.skeleton-actions {
+    height: 2rem;
+    margin-top: 1rem;
+    width: 60%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Passage card hover effects */
+.passage-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Smooth transitions for navigation */
+.nav-menu,
+.auth-links,
+.user-menu {
+    transition: opacity 0.3s ease;
+}
+
+/* Error state styling */
+.error-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #64748b;
+}
+
+.error-state h2 {
+    color: #1e293b;
+    margin-bottom: 1rem;
+}
+
+.error-state a {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+.error-state a:hover {
+    text-decoration: underline;
 }
